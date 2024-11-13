@@ -2,7 +2,7 @@
  * Defines the return result from validateInput.
  */
 export type ValidationResult = {
-    success: boolean;
+    success?: boolean;
     promptContent?: string;
     promptType?: string;
     promptDuration?: number;

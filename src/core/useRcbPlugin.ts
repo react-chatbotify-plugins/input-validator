@@ -46,7 +46,7 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
             const validationResult = validator(
                 event.data.inputText
             ) as ValidationResult;
-            if (!validationResult.success) {
+            if (!validationResult?.success) {
                 event.preventDefault();
             }
 
@@ -69,8 +69,8 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
 
             // shows prompt toast to user
             showToast(
-                validationResult.promptContent ?? "",
-                validationResult.promptDuration
+                validationResult.promptContent,
+                validationResult.promptDuration ?? 3000
             );
 
             // increases number of plugin toasts by 1

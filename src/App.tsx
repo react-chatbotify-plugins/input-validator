@@ -20,8 +20,8 @@ const App = () => {
 			}
 		} as InputValidatorBlock,
 		try_again : {
-			message: "Look at how your message string is reversed! Try again!",
-			path: "try_again",
+			message: "Nice, you passed the input validation!",
+			path: "start",
 		}
 	}
 
@@ -30,7 +30,6 @@ const App = () => {
 			id="chatbot-id"
 			plugins={plugins}
 			flow={flow}
-			// settings={{event:{rcbUserSubmitText: true}}}
 		></ChatBot>
 	);
 }
