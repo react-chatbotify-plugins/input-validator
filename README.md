@@ -1,10 +1,10 @@
 <p align="center">
-  <img width="200px" src="https://raw.githubusercontent.com/tjtanjin/react-chatbotify/main/src/assets/logo.png" />
+  <img width="200px" src="https://raw.githubusercontent.com/react-chatbotify-plugins/input-validator/main/src/assets/logo.png" />
   <h1 align="center">Input Validator</h1>
 </p>
 
 <p align="center">
-  <a href="https://github.com/react-chatbotify-plugins/react-chatbotify-plugin-template/actions/workflows/ci-cd-pipeline.yml"> <img src="https://github.com/react-chatbotify-plugins/input-validator/actions/workflows/ci-cd-pipeline.yml/badge.svg" /> </a>
+  <a href="https://github.com/react-chatbotify-plugins/input-validator/actions/workflows/ci-cd-pipeline.yml"> <img src="https://github.com/react-chatbotify-plugins/input-validator/actions/workflows/ci-cd-pipeline.yml/badge.svg" /> </a>
   <a href="https://www.npmjs.com/package/@rcb-plugins/input-validator"> <img src="https://img.shields.io/npm/v/@rcb-plugins/input-validator?logo=semver&label=version&color=%2331c854" /> </a>
   <a href="https://www.npmjs.com/package/@rcb-plugins/input-validator"> <img src="https://img.shields.io/badge/react-16--19-orange?logo=react&label=react" /> </a>
 </p>
@@ -21,7 +21,9 @@
 
 ### Introduction
 
-<Add demo gif>
+<p align="center">
+  <img height="400px" src="https://github.com/user-attachments/assets/e73e8f0c-5eff-44e6-a48b-e917ed0f7b4f" />
+</p>
 
 **Input Validator** is a plugin that adds user input validation to the [**React ChatBotify Core Library**](https://react-chatbotify.com). By default, the core library does not ship with user input validation. This plugin relies on chatbot events to intercept & validate messages, as well as chatbot hooks to provide visual feedback to users. The demo gif above should give you a pretty good idea of what this plugin is capable of doing.
 
