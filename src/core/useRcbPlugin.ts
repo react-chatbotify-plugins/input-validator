@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
     useBotId,
     RcbUserSubmitTextEvent,
+    RcbUserUploadFileEvent,
     useToasts,
     useFlow,
     useStyles,
@@ -17,7 +18,7 @@ import { getValidator } from "../utils/getValidator";
 /**
  * Plugin hook that handles all the core logic.
  *
- * @param pluginConfig configurations for the plugin
+ * @param pluginConfig Configurations for the plugin.
  */
 const useRcbPlugin = (pluginConfig?: PluginConfig) => {
     const { showToast } = useToasts();
@@ -31,67 +32,116 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
 
     useEffect(() => {
         /**
-         * Handles the user submitting input event.
+         * Handles the user submitting text input event.
          *
-         * @param event event emitted when user submits input
+         * @param event Event emitted when user submits text input.
          */
-        const handleUserSubmitText = (event: RcbUserSubmitTextEvent): void => {
-            // gets validator and if no validator, return
-            const validator = getValidator(event, getBotId(), getFlow());
+        const handleUserSubmitText = (event: Event): void => {
+            const rcbEvent = event as RcbUserSubmitTextEvent;
+
+            // Get validator and if no validator, return
+            const validator = getValidator(rcbEvent, getBotId(), getFlow());
             if (!validator) {
                 return;
             }
 
-            // gets and checks validation result
+            // Get and check validation result
             const validationResult = validator(
-                event.data.inputText
+                rcbEvent.data.inputText
             ) as ValidationResult;
             if (!validationResult?.success) {
                 event.preventDefault();
             }
 
-            // if nothing to prompt, return
+            // If nothing to prompt, return
             if (!validationResult.promptContent) {
                 return;
             }
 
-            // if this is the first plugin toast, preserve original styles for restoration later
+            // Preserve original styles if this is the first plugin toast
             if (numPluginToasts === 0) {
-                originalStyles.current = structuredClone(styles)
+                originalStyles.current = structuredClone(styles);
             }
             const promptStyles = getPromptStyles(
                 validationResult,
                 mergedPluginConfig
             );
 
-            // update toast with prompt styles
+            // Update styles with prompt styles
             updateStyles(promptStyles);
 
-            // shows prompt toast to user
+            // Show prompt toast to user
             showToast(
                 validationResult.promptContent,
                 validationResult.promptDuration ?? 3000
             );
 
-            // increases number of plugin toasts by 1
+            // Increase number of plugin toasts by 1
             setNumPluginToasts((prev) => prev + 1);
         };
 
         /**
-         * Handles the dismiss toast event.
+         * Handles the user uploading a file event.
          *
-         * @param event event emitted when toast is dismissed
+         * @param event Event emitted when user uploads a file.
+         */
+        const handleUserUploadFile = (event: Event): void => {
+            const rcbEvent = event as RcbUserUploadFileEvent;
+            const file: File = rcbEvent.data.files[0];
+
+            // Get validator and if no validator, return
+            const validator = getValidator(rcbEvent, getBotId(), getFlow());
+            if (!validator) {
+                return;
+            }
+
+            // Perform validation
+            const validationResult = validator(file) as ValidationResult;
+            if (!validationResult?.success) {
+                event.preventDefault();
+            }
+
+            // Show prompt if necessary
+            if (validationResult.promptContent) {
+                // Preserve original styles if this is the first plugin toast
+                if (numPluginToasts === 0) {
+                    originalStyles.current = structuredClone(styles);
+                }
+                const promptStyles = getPromptStyles(
+                    validationResult,
+                    mergedPluginConfig
+                );
+
+                // Update styles with prompt styles
+                updateStyles(promptStyles);
+
+                // Show prompt toast to user
+                showToast(
+                    validationResult.promptContent,
+                    validationResult.promptDuration ?? 3000
+                );
+
+                // Increase number of plugin toasts by 1
+                setNumPluginToasts((prev) => prev + 1);
+            }
+        };
+
+        /**
+         * Handles the dismiss toast event.
          */
         const handleDismissToast = (): void => {
             setNumPluginToasts((prev) => prev - 1);
         };
 
-        // adds required events
+        // Add required event listeners
         window.addEventListener("rcb-user-submit-text", handleUserSubmitText);
+        window.addEventListener("rcb-user-upload-file", handleUserUploadFile);
         window.addEventListener("rcb-dismiss-toast", handleDismissToast);
 
         return () => {
+            // Remove event listeners
             window.removeEventListener("rcb-user-submit-text", handleUserSubmitText);
+            window.removeEventListener("rcb-user-upload-file", handleUserUploadFile);
             window.removeEventListener("rcb-dismiss-toast", handleDismissToast);
         };
     }, [
@@ -101,28 +151,29 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
         updateStyles,
         styles,
         mergedPluginConfig,
-        numPluginToasts
+        numPluginToasts,
     ]);
 
-    // restores original styles when plugin toasts are all dismissed
+    // Restore original styles when all plugin toasts are dismissed
     useEffect(() => {
         if (numPluginToasts === 0) {
             setTimeout(() => {
                 replaceStyles(originalStyles.current);
             });
         }
-    }, [numPluginToasts, replaceStyles, originalStyles]);
+    }, [numPluginToasts, replaceStyles]);
 
-    // initializes plugin metadata with plugin name
+    // Initialize plugin metadata with plugin name
     const pluginMetaData: ReturnType<Plugin> = {
-        name: "@rcb-plugins/input-validator"
+        name: "@rcb-plugins/input-validator",
     };
 
-    // adds required events in settings if auto config is true
+    // Add required events in settings if autoConfig is true
     if (mergedPluginConfig.autoConfig) {
         pluginMetaData.settings = {
             event: {
                 rcbUserSubmitText: true,
+                rcbUserUploadFile: true,
                 rcbDismissToast: true,
             },
         };
