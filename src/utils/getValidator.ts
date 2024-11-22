@@ -18,11 +18,11 @@ type RcbUserEvent = RcbUserSubmitTextEvent | RcbUserUploadFileEvent;
  * @returns The validator function if it exists, otherwise undefined.
  */
 export const getValidator = <T = string | File>(
-    event: RcbUserEvent,
-    currBotId: string | null,
-    currFlow: Flow,
-    validatorType: "validateInput" | "validateFileInput" = "validateInput"
-  ): ((input: T) => ValidationResult) | undefined => {
+  event: RcbUserEvent,
+  currBotId: string | null,
+  currFlow: Flow,
+  validatorType: "validateTextInput" | "validateFileInput" = "validateTextInput"
+): ((input: T) => ValidationResult) | undefined => {
     if (!event.detail) {
       return;
     }

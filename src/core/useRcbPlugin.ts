@@ -40,7 +40,12 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
             const rcbEvent = event as RcbUserSubmitTextEvent;
 
             // Get validator and if no validator, return
-            const validator = getValidator(rcbEvent, getBotId(), getFlow());
+            const validator = getValidator<string>(
+                rcbEvent,
+                getBotId(),
+                getFlow(),
+                "validateTextInput"
+              );
             if (!validator) {
                 return;
             }

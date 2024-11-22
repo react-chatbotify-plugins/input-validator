@@ -8,7 +8,7 @@ import { ValidationResult } from "./ValidationResult";
  */
 
 export type InputValidatorBlock = Omit<Block, "file"> & {
-  file?: (params: { files?: FileList }) => void | Promise<void>; // Updated
-  validateInput?: (userInput?: string) => ValidationResult;
+  file?: (params: { files?: FileList }) => void | Promise<void>;
+  validateTextInput?: (userInput?: string) => ValidationResult;
   validateFileInput?: (file?: File) => ValidationResult;
 };
