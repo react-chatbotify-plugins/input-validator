@@ -18,16 +18,6 @@ export const validateFile = (file?: File): ValidationResult => {
       };
     }
   
-    // Check if the input is not a File object (e.g., text input or invalid type)
-    if (!(file instanceof File)) {
-      return {
-        success: false,
-        promptContent: "Invalid input. Please upload a valid file.",
-        promptDuration: 3000,
-        promptType: "error",
-      };
-    }
-  
     // Check if the file is empty
     if (file.size === 0) {
       return {
