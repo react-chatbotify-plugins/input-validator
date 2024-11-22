@@ -2,47 +2,10 @@ import React from "react";
 import ChatBot, { Flow } from "react-chatbotify";
 import RcbPlugin from "./factory/RcbPluginFactory";
 import { InputValidatorBlock } from "./types/InputValidatorBlock";
+import { validateFile } from "./utils/validateFile";
 
 const App = () => {
-  // Initialize the plugin
   const plugins = [RcbPlugin()];
-
-  const handleUpload = (params: { files?: FileList }) => {
-    const files = params.files;
-
-    if (!files || files.length === 0) {
-      return { success: false, promptContent: "No file selected." };
-    }
-
-    const file = files[0];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    // Debugging log for file details
-    console.log("Uploaded file details:", {
-      name: file.name,
-      type: file.type,
-      size: file.size,
-    });
-
-    // Adjusted MIME type checking
-    if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
-      return {
-        success: false,
-        promptContent: "Only JPEG and PNG files are allowed.",
-      };
-    }
-
-    if (file.size > maxSize) {
-      return {
-        success: false,
-        promptContent: "File size must be less than 5MB.",
-      };
-    }
-
-    // If all checks pass
-    console.log("File validation passed:", file.name);
-    return { success: true };
-  };
 
   const flow: Flow = {
     start: {
@@ -61,20 +24,60 @@ const App = () => {
         };
       },
     } as InputValidatorBlock,
+
     age_validation: {
       message: "Great! Now please upload a profile picture (JPEG or PNG).",
-      file: (params) => handleUpload(params),
       path: "file_upload_validation",
-      // Removed validateInput
-    },
+      validateInput: (userInput?: string) => {
+        console.log("validateInput called with userInput:", userInput);
+
+        // Allow empty input or file names with allowed extensions
+        if (
+          !userInput ||
+          /\.(jpg|jpeg|png)$/i.test(userInput.trim())
+        ) {
+          return { success: true };
+        }
+
+        // Disallow other text inputs
+        return {
+          success: false,
+          promptContent: "Please upload a file.",
+          promptDuration: 3000,
+          promptType: "error",
+        };
+      },
+      validateFile: (file?: File) => {
+        return validateFile(file); // Validate file input
+      },
+      file: async ({ files }) => {
+        console.log("Files received:", files);
+
+        if (files && files[0]) {
+          const validationResult = validateFile(files[0]);
+          if (!validationResult.success) {
+            console.error(validationResult.promptContent);
+            return;
+          }
+          console.log("File uploaded successfully:", files[0]);
+        } else {
+          console.error("No file provided.");
+        }
+      },
+    } as InputValidatorBlock,
+
     file_upload_validation: {
-      message: "Thank you! Your profile picture has been uploaded successfully.",
+      message:
+        "Thank you! Your profile picture has been uploaded successfully.",
       path: "end",
     },
+
     end: {
       message: "This is the end of the flow. Thank you!",
     },
   };
+
+ 
 
   return <ChatBot id="chatbot-id" plugins={plugins} flow={flow} />;
 };

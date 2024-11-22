@@ -2,6 +2,7 @@
 
 import { Flow, RcbUserSubmitTextEvent, RcbUserUploadFileEvent } from "react-chatbotify";
 import { InputValidatorBlock } from "../types/InputValidatorBlock";
+import { ValidationResult } from "../types/ValidationResult";
 
 /**
  * Union type for user events that can be validated.
@@ -16,35 +17,31 @@ type RcbUserEvent = RcbUserSubmitTextEvent | RcbUserUploadFileEvent;
  * @param currFlow The current flow object.
  * @returns The validator function if it exists, otherwise undefined.
  */
-export const getValidator = (
+export const getValidator = <T = string | File>(
     event: RcbUserEvent,
     currBotId: string | null,
-    currFlow: Flow
-) => {
+    currFlow: Flow,
+    validatorType: "validateInput" | "validateFileInput" = "validateInput"
+  ): ((input: T) => ValidationResult) | undefined => {
     if (!event.detail) {
-        return;
+      return;
     }
-
+  
     const { botId, currPath } = event.detail;
-
+  
     if (currBotId !== botId) {
-        return;
+      return;
     }
-
+  
     if (!currPath) {
-        return;
+      return;
     }
-
+  
     const currBlock = currFlow[currPath] as InputValidatorBlock;
     if (!currBlock) {
-        return;
+      return;
     }
-
-    const validator = currBlock.validateInput;
-    const isValidatorFunction = validator && typeof validator === "function";
-    if (!isValidatorFunction) {
-        return;
-    }
-
-    return validator;
-};
+  
+    const validator = currBlock[validatorType] as ((input: T) => ValidationResult) | undefined;
+    return typeof validator === "function" ? validator : undefined;
+  };

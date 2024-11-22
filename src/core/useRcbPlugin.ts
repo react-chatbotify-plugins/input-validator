@@ -85,45 +85,42 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
          *
          * @param event Event emitted when user uploads a file.
          */
+        // useRcbPlugin.ts
+
         const handleUserUploadFile = (event: Event): void => {
             const rcbEvent = event as RcbUserUploadFileEvent;
-            const file: File = rcbEvent.data.files[0];
-
-            // Get validator and if no validator, return
-            const validator = getValidator(rcbEvent, getBotId(), getFlow());
+            const file: File | undefined = rcbEvent.data?.files?.[0];
+        
+            if (!file) {
+            console.error("No file uploaded.");
+            event.preventDefault();
+            return;
+            }
+        
+            const validator = getValidator<File>(
+            rcbEvent,
+            getBotId(),
+            getFlow(),
+            "validateFileInput"
+            );
+        
             if (!validator) {
-                return;
+            console.error("Validator not found for file input.");
+            return;
             }
-
-            // Perform validation
-            const validationResult = validator(file) as ValidationResult;
-            if (!validationResult?.success) {
-                event.preventDefault();
-            }
-
-            // Show prompt if necessary
+        
+            const validationResult = validator(file);
+        
+            if (!validationResult.success) {
+            console.error("Validation failed:", validationResult);
             if (validationResult.promptContent) {
-                // Preserve original styles if this is the first plugin toast
-                if (numPluginToasts === 0) {
-                    originalStyles.current = structuredClone(styles);
-                }
-                const promptStyles = getPromptStyles(
-                    validationResult,
-                    mergedPluginConfig
-                );
-
-                // Update styles with prompt styles
-                updateStyles(promptStyles);
-
-                // Show prompt toast to user
-                showToast(
-                    validationResult.promptContent,
-                    validationResult.promptDuration ?? 3000
-                );
-
-                // Increase number of plugin toasts by 1
-                setNumPluginToasts((prev) => prev + 1);
+                showToast(validationResult.promptContent, validationResult.promptDuration ?? 3000);
             }
+            event.preventDefault();
+            return;
+            }
+        
+            console.log("Validation successful:", validationResult);
         };
 
         /**
