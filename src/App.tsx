@@ -1,12 +1,14 @@
-import React from "react";
 import ChatBot, { Flow } from "react-chatbotify";
+
 import RcbPlugin from "./factory/RcbPluginFactory";
 import { InputValidatorBlock } from "./types/InputValidatorBlock";
 import { validateFile } from "./utils/validateFile";
 
 const App = () => {
+  // initialize example plugin
   const plugins = [RcbPlugin()];
 
+  // example flow for testing
   const flow: Flow = {
     start: {
       message: "Hey there! Please enter your age.",
@@ -31,9 +33,9 @@ const App = () => {
       validateInput: (userInput?: string) => {
         console.log("validateInput called with userInput:", userInput);
 
-        // Allow empty input or file names with allowed extensions
+        
         if (
-          !userInput ||
+          userInput &&
           /\.(jpg|jpeg|png)$/i.test(userInput.trim())
         ) {
           return { success: true };
@@ -42,44 +44,46 @@ const App = () => {
         // Disallow other text inputs
         return {
           success: false,
-          promptContent: "Please upload a file.",
+          promptContent: "Please upload a valid file (JPEG or PNG). Empty inputs are not allowed.",
           promptDuration: 3000,
           promptType: "error",
         };
       },
-      validateFile: (file?: File) => {
+      validateFileInput: (file?: File) => {
         return validateFile(file); // Validate file input
       },
       file: async ({ files }) => {
         console.log("Files received:", files);
-
+      
         if (files && files[0]) {
           const validationResult = validateFile(files[0]);
           if (!validationResult.success) {
             console.error(validationResult.promptContent);
-            return;
+            // Return early to prevent success
+            return { success: false };
           }
           console.log("File uploaded successfully:", files[0]);
         } else {
           console.error("No file provided.");
         }
       },
+      
     } as InputValidatorBlock,
 
     file_upload_validation: {
       message:
-        "Thank you! Your profile picture has been uploaded successfully.",
-      path: "end",
+        "Thank you! Your picture has been uploaded successfully. You passed the file upload validation!",
+      path: "start",
     },
+  }
 
-    end: {
-      message: "This is the end of the flow. Thank you!",
-    },
-  };
-
- 
-
-  return <ChatBot id="chatbot-id" plugins={plugins} flow={flow} />;
-};
+  return (
+		<ChatBot
+			id="chatbot-id"
+			plugins={plugins}
+			flow={flow}
+		></ChatBot>
+	);
+}
 
 export default App;
