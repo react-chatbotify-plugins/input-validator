@@ -1,5 +1,3 @@
-// src/utils/getValidator.ts
-
 import { Flow, RcbUserSubmitTextEvent, RcbUserUploadFileEvent } from "react-chatbotify";
 import { InputValidatorBlock } from "../types/InputValidatorBlock";
 import { ValidationResult } from "../types/ValidationResult";
@@ -23,25 +21,15 @@ export const getValidator = <T = string | File>(
   currFlow: Flow,
   validatorType: "validateTextInput" | "validateFileInput" = "validateTextInput"
 ): ((input: T) => ValidationResult) | undefined => {
-    if (!event.detail) {
-      return;
+    if (!event.detail?.currPath || currBotId !== event.detail.botId) {
+        return;
     }
-  
-    const { botId, currPath } = event.detail;
-  
-    if (currBotId !== botId) {
-      return;
-    }
-  
-    if (!currPath) {
-      return;
-    }
-  
-    const currBlock = currFlow[currPath] as InputValidatorBlock;
+
+    const currBlock = currFlow[event.detail.currPath] as InputValidatorBlock;
     if (!currBlock) {
-      return;
+        return;
     }
-  
+
     const validator = currBlock[validatorType] as ((input: T) => ValidationResult) | undefined;
     return typeof validator === "function" ? validator : undefined;
-  };
+};

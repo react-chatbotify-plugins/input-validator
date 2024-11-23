@@ -31,43 +31,21 @@ const App = () => {
       message:
         "Great! Now please upload a profile picture (JPEG or PNG) or provide a URL.",
       path: "file_upload_validation",
-      chatDisabled: true, // Set to true if you want to disable text input
-      validateTextInput: (userInput?: string) => {
-        console.log("validateTextInput called with userInput:", userInput);
-
-        if (userInput && userInput.trim().length > 0) {
-          // Optionally, validate if the input is a valid URL
-          // For simplicity, we'll accept any non-empty text
-          return { success: true };
-        }
-
-        return {
-          success: false,
-          promptContent:
-            "Please provide a valid URL or upload a file.",
-          promptDuration: 3000,
-          promptType: "error",
-        };
-      },
+      chatDisabled: true, // Text input is disabled
       validateFileInput: (file?: File) => {
-        return validateFile(file); // Validate file input
+        return validateFile(file); // Validation is handled here
       },
       file: async ({ files }) => {
         console.log("Files received:", files);
-
+    
         if (files && files[0]) {
-          const validationResult = validateFile(files[0]);
-          if (!validationResult.success) {
-            console.error(validationResult.promptContent);
-            // Return early to prevent success
-            return { success: false };
-          }
           console.log("File uploaded successfully:", files[0]);
         } else {
           console.error("No file provided.");
         }
       },
     } as InputValidatorBlock,
+    
 
     file_upload_validation: {
       message:

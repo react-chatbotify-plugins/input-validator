@@ -18,7 +18,7 @@ import { getValidator } from "../utils/getValidator";
 /**
  * Plugin hook that handles all the core logic.
  *
- * @param pluginConfig Configurations for the plugin.
+ * @param pluginConfig configurations for the plugin
  */
 const useRcbPlugin = (pluginConfig?: PluginConfig) => {
     const { showToast } = useToasts();
@@ -45,7 +45,7 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
                 getBotId(),
                 getFlow(),
                 "validateTextInput"
-              );
+            );
             if (!validator) {
                 return;
             }
@@ -85,51 +85,49 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
             setNumPluginToasts((prev) => prev + 1);
         };
 
-        /**
-         * Handles the user uploading a file event.
-         *
-         * @param event Event emitted when user uploads a file.
-         */
-        // useRcbPlugin.ts
-
         const handleUserUploadFile = (event: Event): void => {
             const rcbEvent = event as RcbUserUploadFileEvent;
             const file: File | undefined = rcbEvent.data?.files?.[0];
-        
+
             if (!file) {
-            console.error("No file uploaded.");
-            event.preventDefault();
-            return;
+                console.error("No file uploaded.");
+                event.preventDefault();
+                return;
             }
-        
+
             const validator = getValidator<File>(
-            rcbEvent,
-            getBotId(),
-            getFlow(),
-            "validateFileInput"
+                rcbEvent,
+                getBotId(),
+                getFlow(),
+                "validateFileInput"
             );
-        
+
             if (!validator) {
-            console.error("Validator not found for file input.");
-            return;
+                console.error("Validator not found for file input.");
+                return;
             }
-        
+
             const validationResult = validator(file);
-        
+
             if (!validationResult.success) {
-            console.error("Validation failed:", validationResult);
-            if (validationResult.promptContent) {
-                showToast(validationResult.promptContent, validationResult.promptDuration ?? 3000);
+                console.error("Validation failed:", validationResult);
+                if (validationResult.promptContent) {
+                    showToast(
+                        validationResult.promptContent,
+                        validationResult.promptDuration ?? 3000
+                    );
+                }
+                event.preventDefault();
+                return;
             }
-            event.preventDefault();
-            return;
-            }
-        
+
             console.log("Validation successful:", validationResult);
         };
 
         /**
          * Handles the dismiss toast event.
+         *
+         * @param event Event emitted when toast is dismissed.
          */
         const handleDismissToast = (): void => {
             setNumPluginToasts((prev) => prev - 1);

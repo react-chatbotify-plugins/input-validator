@@ -1,51 +1,54 @@
 import { ValidationResult } from "../types/ValidationResult";
 
 /**
- * Validates the uploaded file.
- * Ensures the file is of allowed type and size, and rejects non-file inputs.
+ * Validates uploaded files.
+ * Ensures each file is of an allowed type and size, and rejects invalid inputs.
  */
-export const validateFile = (file?: File): ValidationResult => {
+export const validateFile = (input?: File | FileList): ValidationResult => {
     const allowedTypes = ["image/jpeg", "image/png"];
     const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
-  
-    // Check if no file is provided
-    if (!file) {
-      return {
-        success: false,
-        promptContent: "No file uploaded.",
-        promptDuration: 3000,
-        promptType: "error",
-      };
+    const files: File[] = input instanceof FileList ? Array.from(input) : input ? [input] : [];
+
+    // Check if no files are provided
+    if (files.length === 0) {
+        return {
+            success: false,
+            promptContent: "No files uploaded.",
+            promptDuration: 3000,
+            promptType: "error",
+        };
     }
-  
-    // Check if the file is empty
-    if (file.size === 0) {
-      return {
-        success: false,
-        promptContent: "The uploaded file is empty. Please upload a valid file.",
-        promptDuration: 3000,
-        promptType: "error",
-      };
+
+    // Validate each file
+    for (const file of files) {
+        // Check if the file is empty
+        if (file.size === 0) {
+            return {
+                success: false,
+                promptContent: `The file "${file.name}" is empty. Please upload a valid file.`,
+                promptDuration: 3000,
+                promptType: "error",
+            };
+        }
+
+        // Validate file type
+        if (!allowedTypes.includes(file.type)) {
+            return {
+                success: false,
+                promptContent: `The file "${file.name}" is not a valid type. Only JPEG or PNG files are allowed.`,
+                promptType: "error",
+            };
+        }
+
+        // Validate file size
+        if (file.size > maxSizeInBytes) {
+            return {
+                success: false,
+                promptContent: `The file "${file.name}" exceeds the 5MB size limit.`,
+                promptType: "error",
+            };
+        }
     }
-  
-    // Validate file type
-    if (!allowedTypes.includes(file.type)) {
-      return {
-        success: false,
-        promptContent: "Only JPEG or PNG files are allowed.",
-        promptType: "error",
-      };
-    }
-  
-    // Validate file size
-    if (file.size > maxSizeInBytes) {
-      return {
-        success: false,
-        promptContent: "File size must be less than 5MB.",
-        promptType: "error",
-      };
-    }
-  
+
     return { success: true };
-  };
-  
+};
