@@ -17,15 +17,13 @@ describe("getValidator - Valid Cases", () => {
 
         const currBotId = "bot-id";
 
-        // Create a proper CustomEvent mock with prevPath
-        const eventWithPath = new CustomEvent<RcbUserUploadFileEvent["detail"]>("rcb-user-upload-file", {
+        const eventWithPath: RcbUserUploadFileEvent = new CustomEvent("rcb-user-upload-file", {
             detail: { currPath: "start", prevPath: "intro", botId: currBotId },
         }) as RcbUserUploadFileEvent;
 
         const validator = getValidator(eventWithPath, currBotId, flow, "validateFileInput");
         expect(validator).toBe(mockValidateFileInput);
 
-        // Call the validator to ensure it behaves correctly
         const mockFile = new File(["content"], "test.png", { type: "image/png" });
         const result = validator?.(mockFile);
         expect(result).toEqual(mockValidationResult);
@@ -38,20 +36,36 @@ describe("getValidator - Valid Cases", () => {
                 validateFileInput: jest.fn(),
             } as InputValidatorBlock,
         };
-    
+
         const currBotId = "bot-id";
-    
-        // Event with no currPath
-        const eventWithoutPath = new CustomEvent<RcbUserUploadFileEvent["detail"]>("rcb-user-upload-file", {
-            detail: { currPath: null, prevPath: "intro", botId: currBotId }, // Missing currPath
-        }) as RcbUserUploadFileEvent;
-    
+
+        const eventWithoutPath: RcbUserUploadFileEvent = new CustomEvent("rcb-user-upload-file", {
+            detail: { currPath: null, prevPath: "intro", botId: currBotId },
+        }) as unknown as RcbUserUploadFileEvent;
+
         const validator = getValidator(eventWithoutPath, currBotId, flow, "validateFileInput");
-    
-        // Assert that validator is undefined
         expect(validator).toBeUndefined();
     });
+
     test("returns undefined when botId does not match", () => {
+        const flow: Flow = {
+            start: {
+                message: "Upload a file",
+                validateFileInput: jest.fn(),
+            } as InputValidatorBlock,
+        };
+
+        const currBotId = "bot-id";
+
+        const eventWithWrongBotId: RcbUserUploadFileEvent = new CustomEvent("rcb-user-upload-file", {
+            detail: { currPath: "start", prevPath: "intro", botId: "wrong-bot-id" },
+        }) as RcbUserUploadFileEvent;
+
+        const validator = getValidator(eventWithWrongBotId, currBotId, flow, "validateFileInput");
+        expect(validator).toBeUndefined();
+    });
+
+    test("returns undefined when event is null or undefined", () => {
         const flow: Flow = {
             start: {
                 message: "Upload a file",
@@ -61,16 +75,27 @@ describe("getValidator - Valid Cases", () => {
     
         const currBotId = "bot-id";
     
-        // Event with mismatched botId
-        const eventWithWrongBotId = new CustomEvent<RcbUserUploadFileEvent["detail"]>("rcb-user-upload-file", {
-            detail: { currPath: "start", prevPath: "intro", botId: "wrong-bot-id" }, // Mismatched botId
-        }) as RcbUserUploadFileEvent;
+        // Simulate null event
+        let validatorForNull;
+        try {
+            validatorForNull = getValidator(null as unknown as RcbUserUploadFileEvent, currBotId, flow, "validateFileInput");
+        } catch {
+            validatorForNull = undefined; // No need for the error variable
+        }
+        expect(validatorForNull).toBeUndefined();
     
-        const validator = getValidator(eventWithWrongBotId, currBotId, flow, "validateFileInput");
-    
-        // Assert that validator is undefined
-        expect(validator).toBeUndefined();
+        // Simulate undefined event
+        let validatorForUndefined;
+        try {
+            validatorForUndefined = getValidator(undefined as unknown as RcbUserUploadFileEvent, currBotId, flow, "validateFileInput");
+        } catch {
+            validatorForUndefined = undefined; // No need for the error variable
+        }
+        expect(validatorForUndefined).toBeUndefined();
     });
+    
+
+
     test("returns undefined when validator does not exist in the flow block", () => {
         const flow: Flow = {
             start: {
@@ -107,33 +132,6 @@ describe("getValidator - Valid Cases", () => {
         const validator = getValidator(eventWithPath, currBotId, flow, "validateFileInput");
     
         // Assert that validator is undefined
-        expect(validator).toBeUndefined();
-    });
-    test("returns undefined when event is null or undefined", () => {
-        const flow: Flow = {
-            start: {
-                message: "Upload a file",
-                validateFileInput: jest.fn(),
-            } as InputValidatorBlock,
-        };
-    
-        const currBotId = "bot-id";
-    
-        // Simulate null event
-        let validator;
-        try {
-            validator = getValidator(null as any, currBotId, flow, "validateFileInput");
-        } catch (error) {
-            validator = undefined; // Set to undefined if an error occurs
-        }
-        expect(validator).toBeUndefined();
-    
-        // Simulate undefined event
-        try {
-            validator = getValidator(undefined as any, currBotId, flow, "validateFileInput");
-        } catch (error) {
-            validator = undefined; // Set to undefined if an error occurs
-        }
         expect(validator).toBeUndefined();
     });
     test("defaults to validateTextInput when validatorType is not provided", () => {
@@ -174,6 +172,6 @@ describe("getValidator - Valid Cases", () => {
     });
     
     
-    
+
 });
 
