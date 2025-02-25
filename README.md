@@ -25,7 +25,7 @@
   <img height="400px" src="https://github.com/user-attachments/assets/e73e8f0c-5eff-44e6-a48b-e917ed0f7b4f" />
 </p>
 
-**Input Validator** is a plugin that adds user input validation to the [**React ChatBotify Core Library**](https://react-chatbotify.com). By default, the core library does not ship with user input validation. This plugin relies on chatbot events to intercept & validate messages, as well as chatbot hooks to provide visual feedback to users. The demo gif above should give you a pretty good idea of what this plugin is capable of doing.
+**Input Validator** is a plugin that adds user input validation to the [**React ChatBotify Core Library**](https://react-chatbotify.com). By default, the core library does not ship with user input validation. This plugin relies on chatbot events to intercept & validate user inputs, as well as chatbot hooks to provide visual feedback to users. The demo gif above should give you a pretty good idea of what this plugin is capable of doing.
 
 For support, join the plugin community on [**Discord**](https://discord.gg/J6pA4v3AMW) to connect with other developers and get help.
 
@@ -55,7 +55,7 @@ The plugin is incredibly straightforward to use and is [**available on npm**](ht
    };
    ```
 
-4. Add the `validateInput` attribute to the [**Block**](https://react-chatbotify.com/docs/concepts/conversations#block) that requires validation:
+4. Add the `validateTextInput` and/or `validateFileInput` attribute to the [**Block**](https://react-chatbotify.com/docs/concepts/conversations#block) that requires validation:
    ```javascript
    import ChatBot from "react-chatbotify";
    import InputValidator, { InputValidatorBlock } from "@rcb-plugins/input-validator";
@@ -64,7 +64,7 @@ The plugin is incredibly straightforward to use and is [**available on npm**](ht
      const flow = {
        start: {
          message: "What is your age?"
-         validateInput: (userInput) => {
+         validateTextInput: (userInput) => {
            if (isNaN(userInput)) {
              return {success: false, promptContent: "Age must be a number!", promptDuration: 3000}
            }
@@ -83,7 +83,8 @@ The quickstart above shows how input validation can be done for **age input (e.g
 ### Features
 
 **Input Validator** is a lightweight plugin that provides the following features to your chatbot:
-- Validate user input submissions
+- Validate user text input submissions
+- Validate user file input (upload) submissions
 - Notify users with toasts/highlights upon successful/failed validations
 - Advanced styling options upon successful/failed validations
 - Auto setups with necessary events enabled out-of-the-box (plug & play!)
@@ -143,7 +144,7 @@ As you may be able to tell from above, there are 5 configurable sections within 
 
 #### Validating User Input
 
-To validate user input, add the `validateInput` attribute to any Block that requires validation. The `validateInput` attribute is a function that receives the user's input and returns an object indicating the validation result. An example can be seen below:
+The plugin allows validating user text input and file input (upload). To do so, you may add the respective `validateTextInput` and `validateFileInput` attributes to any Block that requires validation. The `validateTextInput` attribute is a function that receives the user's input (string) and returns an object indicating the validation result. The `validateFileInput` attribute is a function that receives the user's uploaded files (FileList) and similarly returns an object indicating the validation result. An example can be seen below:
 
 ```javascript
 import ChatBot from "react-chatbotify";
@@ -175,7 +176,7 @@ const MyComponent = () => {
 }
 ```
 
-As you can see from the example above, `validateInput` takes in a `userInput` parameter and returns an object representing the validation result. The validation result contains a total of 5 properties described in the table below:
+As you can see from the example above, `validateTextInput` takes in a `userInput` (string) parameter and returns an object representing the validation result. The validation result contains a total of 5 properties described in the table below:
 
 | Property               | Type     | Default Value | Description                                                                                                                                 |
 |---------------------|----------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -185,7 +186,7 @@ As you can see from the example above, `validateInput` takes in a `userInput` pa
 | `promptType`        | string   | "info"       | Defines the type of prompt to display (e.g., "error", "warning", etc.), which influences styling and colors set in plugin configurations.   |
 | `highlightTextArea` | boolean  | true       | If set to `true`, highlights the input text area according to validation result, providing more visual feedback.                            |
 
-Note that all above properties have default values assigned to them. This means that if the `validateInput` attribute does not return an expected object, validation fails by default since `success` would be `false`.
+Note that all above properties have default values assigned to them. This means that if the `validateTextInput` attribute does not return an expected object, validation fails by default since `success` would be `false`.
 
 ### Team
 
