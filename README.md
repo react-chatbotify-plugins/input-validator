@@ -154,7 +154,7 @@ const MyComponent = () => {
   const flow = {
     start: {
       message: "What is your age?",
-      validateInput: (userInput) => {
+      validateTextInput: (userInput) => {
         if (isNaN(userInput)) {
           return {
             success: false,

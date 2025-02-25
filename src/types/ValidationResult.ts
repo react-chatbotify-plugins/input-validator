@@ -1,5 +1,5 @@
 /**
- * Defines the return result from validateInput.
+ * Defines the return result from validateTextInput and validateFileInput.
  */
 export type ValidationResult = {
     success?: boolean;
