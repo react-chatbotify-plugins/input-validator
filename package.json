@@ -66,7 +66,7 @@
     "react-chatbotify": "^2.0.0-beta.24",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.7.0",
-    "vite": "^5.4.8",
+    "vite": "^6.3.5",
     "vite-plugin-eslint2": "^5.0.0"
   },
   "optionalDependencies": {
