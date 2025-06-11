@@ -1,3 +1,8 @@
+## v0.3.0 (11-06-2025)
+
+**Note:**
+Minor plugin update and keyword changes.
+
 ## v0.2.0 (26-02-2024)
 
 **Breaking Changes:**
