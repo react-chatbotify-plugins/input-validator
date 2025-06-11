@@ -1,5 +1,6 @@
 {
   "name": "@rcb-plugins/input-validator",
+  "pluginLogo": "https://cdn.jsdelivr.net/gh/react-chatbotify-plugins/input-validator@main/src/assets/logo.webp",
   "homepage": "https://github.com/React-ChatBotify-Plugins/input-validator",
   "keywords": [
     "react",
