@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="200px" src="https://raw.githubusercontent.com/react-chatbotify-plugins/input-validator/main/src/assets/logo.png" />
+  <img width="200px" src="https://raw.githubusercontent.com/react-chatbotify-plugins/input-validator/main/src/assets/logo.webp" />
   <h1 align="center">Input Validator</h1>
 </p>
 
