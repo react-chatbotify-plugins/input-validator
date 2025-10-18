@@ -1,3 +1,8 @@
+## v0.3.1 (18-10-2025)
+
+**Fixed:**
+- Fixed an issue with the plugin not respecting themes/styles
+
 ## v0.3.0 (11-06-2025)
 
 **Note:**

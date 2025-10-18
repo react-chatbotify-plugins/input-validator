@@ -28,7 +28,7 @@ const useRcbPlugin = (pluginConfig?: PluginConfig) => {
 
 	const mergedPluginConfig = mergePluginConfig(pluginConfig);
 	const [numPluginToasts, setNumPluginToasts] = useState<number>(0);
-	const originalStyles = useRef<Styles>({});
+	const originalStyles = useRef<Styles>(structuredClone(styles));
 
 	/**
 	 * Handles the user submitting text input event.
